@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+
+SEA_BLUE = (0, 0x77, 0xBE)
+
+RED = (0xff, 0, 0)
+GREEN = (0, 0xff, 0)
+BLUE = (0, 0, 0xff)
+
+MAGENTA = (0xff, 0, 0xff)

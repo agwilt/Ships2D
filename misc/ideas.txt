@@ -1,0 +1,20 @@
+coordinates:
+ - save the camera's world coords (in meters?), and zoom (top-left of field)
+ - disregard ships too far away from camera, go through and render close ones      (--> two "modes" for ships? accurate and just a point on a map)
+
+-> convert between world coords and screen coords
+
+
+
+
+Turret position variables:
+ - base angle, max left, max right: relative to ship (0° is forwards)
+ - angle: turrent angle relative to base
+ - parent: pointer(?) to parent ship, to determine total world angle --> just hand over parent ship on creation
+ - zoom, camera angle --> update with call to Group of objects
+
+
+
+
+Actor class: has angle, position, velocity, "rudder", etc.
+SubActor class: angle, position relative to parent Actor
