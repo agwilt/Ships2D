@@ -1,0 +1,14 @@
+Classes:
+ * Fuel: Enum, can be Sail, Coal, or Oil
+ * Camera: used to store information about camera. Camera.angle is the angle to
+           the x-Axis (counterclockwise), Camera.zoom is the zoom, Camera.x and
+           Camera.y are the camera's world coordinates in m (as usual, y-Axis
+           upside-down)
+ * _Actor: used for all sprites in the game. Includes method to set image, rect
+           according to camera. self.x, self.y, self.angle: world coordinates [m]
+ * _SubActor: used for sprites bound to other actors (e.g. Turret). Needs a
+              parent, has angle, position relative to parent
+ * Turret: concrete class used for turrets (contains ammo, max. angles, etc.)
+ * Ship: used for ships, inherited from _Actor. Contains tonnes of stats like
+         dimensions, armour, class name, etc.
+ * ShipGroup: inherited from pygame.sprite.Group, to manage a group of ships

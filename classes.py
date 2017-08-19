@@ -17,16 +17,6 @@ class Camera():
         self.y = y
         self.zoom = zoom
         self.angle = angle
-    def __getitem__(self, key):
-        if key == 0:
-            return self.x
-        elif key == 1:
-            return self.y
-        elif isinstance(key, int):
-            raise IndexError("invalid dimension: %d" % key)
-        else:
-            raise KeyError("Index must be an int")
-
 
 #
 # Abstract classes
