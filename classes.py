@@ -52,10 +52,10 @@ class _SubActor(_Actor):
         pygame.sprite.Sprite.__init__(self)
 
         self.parent = parent
-        self.base_angle = base_angle # angle relative to parent (0° for forwards)
+        self.base_angle = base_angle # CCW angle relative to parent (0° for forwards)
         self.pos_fore = pos_fore # distance along centreline, from middle [m]
-        self.pos_centre = pos_centre # distance from centreline
-        self.rel_angle = 0
+        self.pos_centre = pos_centre # distance from centreline [m]
+        self.rel_angle = 0 # angle relative to base
         self._image_orig = pygame.image.load(self._image_name).convert_alpha()
         self._length, self._width = self._image_orig.get_size()
 
@@ -64,12 +64,12 @@ class _SubActor(_Actor):
             if self.pos_centre == 0:
                 return int(self.parent.x + self.pos_fore*math.cos(math.radians(self.parent.angle)))
             else:
-                return int(self.parent.x + self.pos_fore*math.cos(math.radians(self.parent.angle)) - self.pos_centre*math.sin(math.radians(self.parent.angle)))
+                return int(self.parent.x + self.pos_fore*math.cos(math.radians(self.parent.angle)) - self.pos_centre*math.sin(-math.radians(self.parent.angle)))
         elif name == "y":
             if self.pos_centre == 0:
                 return int(self.parent.y - self.pos_fore*math.sin(math.radians(self.parent.angle)))
             else:
-                return int(self.parent.y - self.pos_fore*math.sin(math.radians(self.parent.angle)) + self.pos_centre*math.cos(math.radians(self.parent.angle)))
+                return int(self.parent.y - self.pos_fore*math.sin(math.radians(self.parent.angle)) + self.pos_centre*math.cos(-math.radians(self.parent.angle)))
         elif name == "angle":
             return self.parent.angle + self.base_angle + self.rel_angle
         else:

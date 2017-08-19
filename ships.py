@@ -26,7 +26,7 @@ class Dreadnought(Ship):
     def __init__(self, name):
         super().__init__(name)
 
-        self.turret_names = {'A':turrets.Gun_12inch_dual(self, 57, 0), 'X':turrets.Gun_12inch_dual(self, 0, 0, base_angle=180), 'Y':turrets.Gun_12inch_dual(self, 0, 0, base_angle=180), 'L':turrets.Gun_12inch_dual(self, 43, -4, max_langle=180, max_rangle=0), 'R':turrets.Gun_12inch_dual(self, 43, 4, max_langle=0, max_rangle=180)}
+        self.turret_names = {'A':turrets.Gun_12inch_dual(self, 40, 0), 'X':turrets.Gun_12inch_dual(self, -20, 0, base_angle=180), 'Y':turrets.Gun_12inch_dual(self, -44, 0, base_angle=180), 'L':turrets.Gun_12inch_dual(self, 10, -8, max_langle=180, max_rangle=0), 'R':turrets.Gun_12inch_dual(self, 10, 8, max_langle=0, max_rangle=180)}
         for tur_name in self.turret_names:
             self.turrets.add(self.turret_names[tur_name])
         self.weapon_groups = [pygame.sprite.Group() for i in range(9)]
