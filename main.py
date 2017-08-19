@@ -45,7 +45,7 @@ ship_list.add(ships.Dreadnought("HMS Dreadnought"))
 d = ship_list.sprites()[0]
 
 # set zoom:
-camera = Camera(0, 0, 4, 0)
+camera = Camera(0, 0, 4)
 
 ship_list.setcamera(camera)
 
@@ -71,10 +71,6 @@ while True:
                 quit_game()
 
     keys=pygame.key.get_pressed()
-    if keys[INPUT_CAMERA_CCW]:
-        camera.angle = (camera.angle + 1)%360
-    if keys[INPUT_CAMERA_CW]:
-        camera.angle = (camera.angle - 1)%360
     if keys[INPUT_CAMERA_LEFT]:
         camera.x -= 1
     if keys[INPUT_CAMERA_RIGHT]:
