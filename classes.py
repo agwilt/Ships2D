@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import pygame
+import math
 from pygame.locals import *
 from enum import Enum
 
@@ -25,7 +26,7 @@ class Camera():
 class _Actor(pygame.sprite.Sprite):
     _image_name = ""
 
-    def __init__(self, camera):
+    def __init__(self):
         super().__init__()
         self.angle = 0
         self.x = 0
@@ -33,37 +34,47 @@ class _Actor(pygame.sprite.Sprite):
 
         self._image_orig = pygame.image.load(self._image_name).convert_alpha()
         self._length, self._width = self._image_orig.get_size()
-        self.setcamera(camera)
 
     def setcamera(self, camera):
         # change zoom/rotation/position of camera
         # WARNING: camera only, this is purely to change the sprite and rect
         self.image = pygame.transform.scale(self._image_orig, (self._length*camera.zoom, self._width*camera.zoom))
-        self.image = pygame.transform.rotate(self.image, self.angle + camera.angle)
+        self.image = pygame.transform.rotate(self.image, self.angle - camera.angle)
         self.rect = self.image.get_rect()
+        # set posision
+        d = math.sqrt((self.x - camera.x)**2 + (self.y - camera.y)**2)
+        beta = math.atan2((self.x - camera.x), (self.y - camera.y)) - camera.angle
+        if self._image_name == "images/ships/HMS Dreadnought.bmp":
+            print(beta)
+        self.rect.centerx = camera.zoom * d * math.sin(beta)// 2
+        self.rect.centery = camera.zoom * d * math.cos(beta)// 2
 
 
 
 # a bit of sillyness:
 class _SubActor(_Actor):
     def __init__(self, parent, pos_fore, pos_centre, base_angle):
+        pygame.sprite.Sprite.__init__(self)
+
         self.parent = parent
         self.base_angle = base_angle # angle relative to parent (0° for forwards)
         self.pos_fore = pos_fore # distance along centreline, from middle [m]
         self.pos_centre = pos_centre # distance from centreline
-        super().__init__()
+        self.angle = 0
+        self._image_orig = pygame.image.load(self._image_name).convert_alpha()
+        self._length, self._width = self._image_orig.get_size()
 
     def __getattr__(self, name):
         if name == "x":
             if self.pos_centre == 0:
-                return int(parent.x + self.pos_fore*math.cos(parent.angle))
+                return int(self.parent.x + self.pos_fore*math.cos(math.radians(self.parent.angle)))
             else:
-                return int(parent.x + self.pos_fore*math.cos(parent.angle) - self.pos_centre*math.sin(parent.angle))
+                return int(self.parent.x + self.pos_fore*math.cos(math.radians(self.parent.angle)) - self.pos_centre*math.sin(math.radians(self.parent.angle)))
         elif name == "y":
             if self.pos_centre == 0:
-                return int(parent.y - self.pos_fore*math.sin(parent.angle))
+                return int(self.parent.y - self.pos_fore*math.sin(math.radians(self.parent.angle)))
             else:
-                return int(parent.y - self.pos_fore*math.sin(parent.angle) + self.pos_centre*math.cos(parent.angle))
+                return int(self.parent.y - self.pos_fore*math.sin(math.radians(self.parent.angle)) + self.pos_centre*math.cos(math.radians(self.parent.angle)))
         else:
             super().__getattr__(name)
 
@@ -78,9 +89,9 @@ class _SubActor(_Actor):
         self.rect.left = self.parent.rect.left + self.pos_fore*self.zoom
         self.rect.centery = self.parent.rect.centery + self.pos_centre*self.zoom
 
-    def rotozoom(self, angle, scale):
+    def setcamera(self, camera):
         # add parent's angle
-        super().rotozoom(angle+self.base_angle+self.parent.angle, scale)
+        super().setcamera(Camera(camera.x, camera.y, camera.zoom, camera.angle-self.base_angle-self.parent.angle))
 
 
 #
@@ -137,8 +148,12 @@ class Ship(_Actor):
         self.res_fuel = self.fuel_cap
         self.res_water = 0 # taking on water? ..
 
-        self.pos = [0,0]
-        self.v = [1,0]
+        self.x = 0
+        self.y = 0
+        self.v_x = 0
+        self.v_y = 0
+        self.a = 0 # acceleration in direction of velocity
+        self.a_turn = 0 # amount the ships is turning
 
         super().__init__()
 
@@ -147,15 +162,15 @@ class Ship(_Actor):
     def mass(self):
         return self.dry_mass + self.res_fuel + self.res_water
 
-    def rotozoom(self, angle, scale):
-        super().rotozoom(angle, scale)
+    def setcamera(self, camera):
+        super().setcamera(camera)
         # zoom turrets
         for turret in self.turrets.sprites():
-            turret.rotozoom(angle, scale)
+            turret.setcamera(camera)
 
     def update(self):
-        self.rect.x += self.v[0]
-        self.rect.y += self.v[1]
+        self.x += self.v_x
+        self.y += self.v_y
         self.turrets.update()
 
 
@@ -171,6 +186,6 @@ class ShipGroup(pygame.sprite.Group):
         for ship in self.sprites():
             ship.turrets.clear(surface, background)
 
-    def rotozoom(self, angle, scale):
+    def setcamera(self, camera):
         for ship in self.sprites():
-            ship.rotozoom(angle, scale)
+            ship.setcamera(camera)

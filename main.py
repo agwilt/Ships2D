@@ -2,6 +2,7 @@
 
 import sys
 import pygame
+import math
 from pygame.locals import *
 
 import ships, util
@@ -41,10 +42,12 @@ selected_ships = ShipGroup()
 
 ship_list.add(ships.Dreadnought("HMS Dreadnought"))
 
+d = ship_list.sprites()[0]
+
 # set zoom:
 camera = Camera(0, 0, 4, 0)
 
-ship_list.rotozoom(angle, zoom)
+ship_list.setcamera(camera)
 
 # main loop
 
@@ -60,22 +63,41 @@ while True:
             if event.button == 4:
                 if camera.zoom <= 16:
                     camera.zoom += 1
-                ship_list.rotozoom(angle, zoom)
             if event.button == 5:
                 if camera.zoom >= 2:
                     camera.zoom -= 1
-                ship_list.rotozoom(angle, zoom)
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 quit_game()
 
     keys=pygame.key.get_pressed()
     if keys[INPUT_CAMERA_CCW]:
-        angle = (angle + 1)%360
-        ship_list.setcamera(camera)
+        camera.angle = (camera.angle + 1)%360
     if keys[INPUT_CAMERA_CW]:
-        angle = (angle - 1)%360
-        ship_list.setcamera(camera)
+        camera.angle = (camera.angle - 1)%360
+    if keys[INPUT_CAMERA_LEFT]:
+        camera.x -= 1
+    if keys[INPUT_CAMERA_RIGHT]:
+        camera.x += 1
+    if keys[INPUT_CAMERA_UP]:
+        camera.y -= 1
+    if keys[INPUT_CAMERA_DOWN]:
+        camera.y += 1
+    if keys[INPUT_TURN_LEFT]:
+        d.angle = (d.angle + 1)%360
+    if keys[INPUT_TURN_RIGHT]:
+        d.angle = (d.angle - 1)%360
+    if keys[INPUT_MOVE_FRONT]:
+        d.x += int(5 * math.cos(math.radians(d.angle)))
+        d.y -= int(5 * math.sin(math.radians(d.angle)))
+    if keys[INPUT_MOVE_BACK]:
+        d.x -= int(5 * math.cos(math.radians(d.angle)))
+        d.y += int(5 * math.sin(math.radians(d.angle)))
+
+    #print("Status: Position %d, %d" % (d.turret_names['A'].x, d.turret_names['A'].y))
+    #print("        Angle %d"  % d.angle)
+
+    ship_list.setcamera(camera)
 
     ship_list.update()
     ship_list.clear(screen, background)
